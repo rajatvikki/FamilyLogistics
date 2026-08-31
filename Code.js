@@ -7,6 +7,13 @@ function getCalendar() {
 }
 
 function doGet(e) {
+  const secretKey = getSecretKey();
+  const requestKey = e && e.parameter ? e.parameter.key : null;
+  if (!secretKey || requestKey !== secretKey) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "unauthorized" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   const cal = getCalendar();
   const now = new Date();
   // Fetch events for the past 2 days and next 14 days

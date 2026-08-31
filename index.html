@@ -152,11 +152,18 @@
     async function fetchEvents() {
       const listEl = document.getElementById('eventsList');
       const todayEl = document.getElementById('todayList');
+      const key = getSecretKey();
       listEl.innerHTML = '<div class="text-center text-slate-400 py-8">Updating...</div>';
       todayEl.innerHTML = '<div class="text-center text-slate-400 py-2 text-sm">Updating...</div>';
+      if (!key) {
+        todayEl.innerHTML = '<div class="text-center text-slate-400 py-2 text-sm">Passcode required to load the plan.</div>';
+        listEl.innerHTML = '';
+        return;
+      }
       try {
-        const res = await fetch(API_URL);
+        const res = await fetch(`${API_URL}?key=${encodeURIComponent(key)}`);
         const data = await res.json();
+        if (data.status === 'unauthorized') throw new Error('unauthorized');
         fetchedEvents = data;
         const today = new Date();
         document.getElementById('todayTitle').textContent = `Today - ${today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}`;
@@ -169,8 +176,14 @@
         
         renderPlanEvents();
       } catch (e) {
-        todayEl.innerHTML = '<div class="text-center text-red-500 py-2 text-sm">Failed to load today\'s plan.</div>';
-        listEl.innerHTML = '<div class="text-center text-red-500 py-4">Failed to load events. Check API URL.</div>';
+        if (e.message === 'unauthorized') {
+          localStorage.removeItem('family_app_secret');
+          todayEl.innerHTML = '<div class="text-center text-red-500 py-2 text-sm">Passcode was not accepted. Refresh to try again.</div>';
+          listEl.innerHTML = '';
+        } else {
+          todayEl.innerHTML = '<div class="text-center text-red-500 py-2 text-sm">Failed to load today\'s plan.</div>';
+          listEl.innerHTML = '<div class="text-center text-red-500 py-4">Failed to load events. Check API URL.</div>';
+        }
       }
     }
 

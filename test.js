@@ -125,8 +125,11 @@ assert.strictEqual(createdEvents.length, 3);
 assert.strictEqual(createdEvents[2].recurrenceWeekday, 'MONDAY');
 assert.deepStrictEqual(createdEvents[2].reminders, [15]);
 
-const events = JSON.parse(doGet({}).content);
+const unauthorizedGet = JSON.parse(doGet({ parameter: {} }).content);
+assert.deepStrictEqual(unauthorizedGet, { status: 'unauthorized' });
+
+const events = JSON.parse(doGet({ parameter: { key: TEST_SECRET_KEY } }).content);
 assert.strictEqual(events.length, 3);
 assert.strictEqual(events[0].title, 'Our Turn Carpool: Drop-off - Dad');
 
-console.log('Backend tests passed: authorization, all-day events, timed events, weekly series, notes, reminders, and event retrieval.');
+console.log('Backend tests passed: protected reads and writes, all-day events, timed events, weekly series, notes, reminders, and event retrieval.');
