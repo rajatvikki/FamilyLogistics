@@ -3,122 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e293b">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://script.google.com https://script.googleusercontent.com; img-src 'self' data:; style-src 'self'; script-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <title>Family Logistics</title>
-  <link rel="manifest" href="data:application/manifest+json,{ %22name%22:%22Family%20Logistics%22,%22short_name%22:%22Family%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%23f3f4f6%22,%22theme_color%22:%22%232563eb%22 }">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
 </head>
-<body class="bg-slate-100 min-h-screen pb-12 font-sans">
-  <div class="max-w-md mx-auto p-4">
-    <header class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold text-slate-800">🗓️ Family Logistics</h1>
-      <button onclick="fetchEvents()" class="text-sm bg-white border border-slate-300 px-3 py-1.5 rounded-lg shadow-sm font-medium text-slate-600 active:bg-slate-50">Refresh</button>
+<body>
+  <div>
+    <header>
+      <h1>Family Logistics</h1>
+      <button id="refreshButton" type="button">Refresh</button>
     </header>
 
-    <div role="tablist" aria-label="Family Logistics views" class="grid grid-cols-2 gap-2 mb-4">
-      <button id="todayTab" role="tab" aria-selected="true" aria-controls="todayPanel" onclick="switchTab('today')" class="p-2 text-sm font-semibold bg-slate-800 text-white rounded-lg">Today</button>
-      <button id="addTab" role="tab" aria-selected="false" aria-controls="addPanel" onclick="switchTab('add')" class="p-2 text-sm font-semibold bg-white text-slate-600 border border-slate-300 rounded-lg">Add</button>
+    <div role="tablist" aria-label="Family Logistics views">
+      <button id="todayTab" role="tab" aria-selected="true" aria-controls="todayPanel" type="button">Today</button>
+      <button id="addTab" role="tab" aria-selected="false" aria-controls="addPanel" type="button">Add</button>
     </div>
 
     <section id="todayPanel" role="tabpanel" aria-labelledby="todayTab">
-      <!-- Today's Plan -->
-      <section class="mb-6">
-        <h2 id="todayTitle" class="text-sm font-semibold text-slate-500 mb-3">Today</h2>
-        <div id="todayList" class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-          <div class="text-center text-slate-400 py-2 text-sm">Loading today's plan...</div>
+      <section>
+        <h2 id="todayTitle">Today</h2>
+        <div id="todayList">
+          <div class="status-message">Loading today's plan...</div>
         </div>
       </section>
 
-      <!-- Agenda View -->
-      <div class="flex justify-between items-center gap-3 mb-3">
-        <h2 id="planRangeTitle" class="text-sm font-semibold text-slate-500">Today & Tomorrow</h2>
-        <div class="flex border border-slate-300 rounded-lg overflow-hidden">
-          <button id="twoDaysButton" onclick="setPlanRange('twoDays')" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-800 text-white">2 days</button>
-          <button id="weekButton" onclick="setPlanRange('week')" class="px-2.5 py-1.5 text-xs font-semibold bg-white text-slate-600 border-l border-slate-300">This week</button>
+      <div class="plan-toolbar">
+        <h2 id="planRangeTitle">Today &amp; Tomorrow</h2>
+        <div class="plan-toggle" aria-label="Plan range">
+          <button id="twoDaysButton" class="selected" type="button">2 days</button>
+          <button id="weekButton" type="button">This week</button>
         </div>
       </div>
-      <div id="eventsList" class="space-y-2">
-        <div class="text-center text-slate-400 py-8">Loading schedule...</div>
+      <div id="eventsList">
+        <div class="status-message">Loading schedule...</div>
       </div>
     </section>
 
-    <!-- Quick Entry Card -->
-    <div id="addPanel" role="tabpanel" aria-labelledby="addTab" class="hidden bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Add Activity</h2>
-        <button onclick="resetSecretKey()" class="text-xs font-medium text-slate-500 underline">Reset passcode</button>
-      </div>
-      
-      <!-- Date Selector -->
-      <input type="date" id="eventDate" class="w-full mb-3 p-2 border border-slate-300 rounded-lg text-slate-800 font-medium">
-
-      <!-- Preset Chips -->
-      <div class="grid grid-cols-2 gap-2 mb-3">
-        <button onclick="submitPreset('🏢 Dad in Office')" class="p-2 text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 rounded-lg hover:bg-sky-100 active:scale-95 text-left">🏢 Dad in Office</button>
-        <button onclick="submitPreset('🏢 Mom in Office')" class="p-2 text-xs font-semibold bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200 rounded-lg hover:bg-fuchsia-100 active:scale-95 text-left">🏢 Mom in Office</button>
-        <button onclick="submitPreset('🏢 Both Office')" class="p-2 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-200 active:scale-95 text-left">🏢 Both Office</button>
+    <section id="addPanel" role="tabpanel" aria-labelledby="addTab" class="hidden">
+      <div class="form-header">
+        <h2>Quick Add Activity</h2>
+        <button id="resetPasscodeButton" type="button">Reset passcode</button>
       </div>
 
-      <!-- Our Carpool Turn -->
-      <div class="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-        <h3 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-2">Our Carpool Turn</h3>
-        <div class="grid grid-cols-2 gap-2 mb-2">
-          <label class="text-xs font-medium text-amber-900">
+      <input type="date" id="eventDate" aria-label="Activity date">
+
+      <div id="presetButtons">
+        <button type="button" data-preset="Dad in Office">Dad in Office</button>
+        <button type="button" data-preset="Mom in Office">Mom in Office</button>
+        <button type="button" data-preset="Both Office">Both Office</button>
+      </div>
+
+      <section id="carpoolForm">
+        <h3>Our Carpool Turn</h3>
+        <div class="form-grid">
+          <label>
             Trip
-            <select id="carpoolTrip" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800">
+            <select id="carpoolTrip">
               <option value="Drop-off">Drop-off</option>
               <option value="Pick-up">Pick-up</option>
             </select>
           </label>
-          <label class="text-xs font-medium text-amber-900">
+          <label>
             Driver
-            <select id="carpoolDriver" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800">
+            <select id="carpoolDriver">
               <option value="Dad">Dad</option>
               <option value="Mom">Mom</option>
             </select>
           </label>
         </div>
-        <label class="block text-xs font-medium text-amber-900 mb-2">
+        <label id="carpoolScheduleLabel">
           Schedule
-          <select id="carpoolSchedule" onchange="updateCarpoolDriverFields()" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800">
+          <select id="carpoolSchedule">
             <option value="day">Selected day only</option>
             <option value="week">Whole school week (Mon-Fri)</option>
           </select>
         </label>
-        <div id="weeklyCarpoolDrivers" class="hidden grid grid-cols-2 gap-2 mb-2">
-          <label class="text-xs font-medium text-amber-900">Monday
-            <select id="carpoolDriverMonday" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800"><option>Dad</option><option>Mom</option></select>
-          </label>
-          <label class="text-xs font-medium text-amber-900">Tuesday
-            <select id="carpoolDriverTuesday" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800"><option>Dad</option><option>Mom</option></select>
-          </label>
-          <label class="text-xs font-medium text-amber-900">Wednesday
-            <select id="carpoolDriverWednesday" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800"><option>Dad</option><option>Mom</option></select>
-          </label>
-          <label class="text-xs font-medium text-amber-900">Thursday
-            <select id="carpoolDriverThursday" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800"><option>Dad</option><option>Mom</option></select>
-          </label>
-          <label class="text-xs font-medium text-amber-900">Friday
-            <select id="carpoolDriverFriday" class="w-full mt-1 p-2 border border-amber-300 rounded-md bg-white text-slate-800"><option>Dad</option><option>Mom</option></select>
-          </label>
+        <div id="weeklyCarpoolDrivers" class="hidden">
+          <label>Monday<select id="carpoolDriverMonday"><option>Dad</option><option>Mom</option></select></label>
+          <label>Tuesday<select id="carpoolDriverTuesday"><option>Dad</option><option>Mom</option></select></label>
+          <label>Wednesday<select id="carpoolDriverWednesday"><option>Dad</option><option>Mom</option></select></label>
+          <label>Thursday<select id="carpoolDriverThursday"><option>Dad</option><option>Mom</option></select></label>
+          <label>Friday<select id="carpoolDriverFriday"><option>Dad</option><option>Mom</option></select></label>
         </div>
-        <button onclick="submitCarpoolTurn()" class="w-full p-2 text-xs font-semibold bg-amber-500 text-white rounded-lg hover:bg-amber-600 active:scale-95">Add Our Carpool Turn</button>
-      </div>
+        <button id="addCarpoolButton" type="button">Add Our Carpool Turn</button>
+      </section>
 
-      <!-- Kids Activity -->
-      <div class="mb-3 p-3 bg-rose-50 border border-rose-200 rounded-lg">
-        <h3 class="text-xs font-semibold text-rose-800 uppercase tracking-wider mb-2">Kids Activity</h3>
-        <input type="text" id="kidsActivityName" placeholder="Activity name, e.g. Soccer" class="w-full mb-2 p-2 border border-rose-300 rounded-md text-sm text-slate-800">
-        <div class="grid grid-cols-2 gap-2 mb-2">
-          <label class="text-xs font-medium text-rose-900">
+      <section id="kidsActivityForm">
+        <h3>Kids Activity</h3>
+        <input type="text" id="kidsActivityName" placeholder="Activity name, e.g. Soccer">
+        <div class="form-grid">
+          <label>
             Schedule
-            <select id="kidsActivitySchedule" class="w-full mt-1 p-2 border border-rose-300 rounded-md bg-white text-slate-800">
+            <select id="kidsActivitySchedule">
               <option value="day">Selected day only</option>
               <option value="weekly">Repeats every week</option>
             </select>
           </label>
-          <label class="text-xs font-medium text-rose-900">
+          <label>
             Weekly day
-            <select id="kidsActivityWeekday" class="w-full mt-1 p-2 border border-rose-300 rounded-md bg-white text-slate-800">
+            <select id="kidsActivityWeekday">
               <option value="MONDAY">Monday</option>
               <option value="TUESDAY">Tuesday</option>
               <option value="WEDNESDAY">Wednesday</option>
@@ -129,227 +117,14 @@
             </select>
           </label>
         </div>
-        <button onclick="submitKidsActivity()" class="w-full p-2 text-xs font-semibold bg-rose-500 text-white rounded-lg hover:bg-rose-600 active:scale-95">Add Kids Activity</button>
-      </div>
+        <button id="addKidsActivityButton" type="button">Add Kids Activity</button>
+      </section>
 
-      <!-- Custom Note Input -->
-      <div class="flex gap-2">
-        <input type="text" id="customNote" placeholder="Or type a custom note..." class="flex-1 p-2 border border-slate-300 rounded-lg text-sm">
-        <button onclick="submitCustom()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 active:scale-95">Add</button>
+      <div id="customEntry">
+        <input type="text" id="customNote" placeholder="Or type a custom note...">
+        <button id="addCustomButton" type="button">Add</button>
       </div>
-    </div>
-
+    </section>
   </div>
-
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyvV5ZYGdfIXc8-Gt-CE0qiaIGRtE0MMCuFeGvvxNY7Ll7JxPhzK2zUSetJ_jhiVnMO/exec"; // Replace with your deployment URL
-    let planRange = 'twoDays';
-    let fetchedEvents = [];
-
-    // Default date input to today
-    document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
-
-    async function fetchEvents() {
-      const listEl = document.getElementById('eventsList');
-      const todayEl = document.getElementById('todayList');
-      const key = getSecretKey();
-      listEl.innerHTML = '<div class="text-center text-slate-400 py-8">Updating...</div>';
-      todayEl.innerHTML = '<div class="text-center text-slate-400 py-2 text-sm">Updating...</div>';
-      if (!key) {
-        todayEl.innerHTML = '<div class="text-center text-slate-400 py-2 text-sm">Passcode required to load the plan.</div>';
-        listEl.innerHTML = '';
-        return;
-      }
-      try {
-        const res = await fetch(`${API_URL}?key=${encodeURIComponent(key)}`);
-        const data = await res.json();
-        if (data.status === 'unauthorized') throw new Error('unauthorized');
-        fetchedEvents = data;
-        const today = new Date();
-        document.getElementById('todayTitle').textContent = `Today - ${today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}`;
-        const todayKey = today.toISOString().split('T')[0];
-        const todayEvents = data.filter(evt => evt.start.split('T')[0] === todayKey);
-
-        todayEl.innerHTML = todayEvents.length
-          ? `<div class="space-y-1">${todayEvents.map(e => `<div class="text-sm font-medium text-slate-800 bg-slate-50 p-2 rounded">${e.title}</div>`).join('')}</div>`
-          : '<div class="text-center text-slate-400 py-2 text-sm">No activities planned today.</div>';
-        
-        renderPlanEvents();
-      } catch (e) {
-        if (e.message === 'unauthorized') {
-          localStorage.removeItem('family_app_secret');
-          todayEl.innerHTML = '<div class="text-center text-red-500 py-2 text-sm">Passcode was not accepted. Refresh to try again.</div>';
-          listEl.innerHTML = '';
-        } else {
-          todayEl.innerHTML = '<div class="text-center text-red-500 py-2 text-sm">Failed to load today\'s plan.</div>';
-          listEl.innerHTML = '<div class="text-center text-red-500 py-4">Failed to load events. Check API URL.</div>';
-        }
-      }
-    }
-
-    function setPlanRange(range) {
-      planRange = range;
-      const isTwoDays = range === 'twoDays';
-      document.getElementById('planRangeTitle').textContent = isTwoDays ? 'Today & Tomorrow' : 'This Week';
-      document.getElementById('twoDaysButton').className = isTwoDays
-        ? 'px-2.5 py-1.5 text-xs font-semibold bg-slate-800 text-white'
-        : 'px-2.5 py-1.5 text-xs font-semibold bg-white text-slate-600';
-      document.getElementById('weekButton').className = isTwoDays
-        ? 'px-2.5 py-1.5 text-xs font-semibold bg-white text-slate-600 border-l border-slate-300'
-        : 'px-2.5 py-1.5 text-xs font-semibold bg-slate-800 text-white border-l border-slate-800';
-      renderPlanEvents();
-    }
-
-    function renderPlanEvents() {
-      const listEl = document.getElementById('eventsList');
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const endDate = new Date(today);
-      endDate.setDate(today.getDate() + (planRange === 'twoDays' ? 1 : 6));
-      const visibleEvents = fetchedEvents.filter(evt => {
-        const eventDate = new Date(`${evt.start.split('T')[0]}T00:00:00`);
-        return eventDate >= today && eventDate <= endDate;
-      });
-
-      if (visibleEvents.length === 0) {
-        listEl.innerHTML = '<div class="text-center text-slate-400 py-8">No activities planned.</div>';
-        return;
-      }
-
-      const grouped = {};
-      visibleEvents.forEach(evt => {
-          const dateKey = evt.start.split('T')[0];
-          if (!grouped[dateKey]) grouped[dateKey] = [];
-          grouped[dateKey].push(evt);
-      });
-
-      listEl.innerHTML = Object.keys(grouped).sort().map(date => `
-        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-          <div class="text-xs font-bold text-slate-400 mb-1">${new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-          <div class="space-y-1">
-            ${grouped[date].map(e => `<div class="text-sm font-medium text-slate-800 bg-slate-50 p-2 rounded">${e.title}</div>`).join('')}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function postEvent(title, dateOverride, options = {}) {
-      const date = dateOverride || document.getElementById('eventDate').value;
-      const key = getSecretKey();
-      if (!date) return alert("Select a date!");
-      if (!key) return alert('Passcode required to post events.');
-
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-
-        body: JSON.stringify({ 
-      key: key,
-            title: title, 
-            date: date, 
-            isAllDay: true,
-            ...options
-            })
-    });
-
-      document.getElementById('customNote').value = '';
-      if (!dateOverride) fetchEvents();
-    }
-
-    function getSecretKey() {
-      let key = localStorage.getItem('family_app_secret');
-      if (!key) {
-        key = prompt('Enter Family App Passcode:');
-        if (key) localStorage.setItem('family_app_secret', key);
-      }
-      return key;
-    }
-
-    function resetSecretKey() {
-      localStorage.removeItem('family_app_secret');
-      alert('Passcode cleared.');
-    }
-
-    function submitPreset(title) { postEvent(title); }
-    function switchTab(tab) {
-      const isToday = tab === 'today';
-      document.getElementById('todayPanel').classList.toggle('hidden', !isToday);
-      document.getElementById('addPanel').classList.toggle('hidden', isToday);
-      document.getElementById('todayTab').setAttribute('aria-selected', String(isToday));
-      document.getElementById('addTab').setAttribute('aria-selected', String(!isToday));
-      document.getElementById('todayTab').className = isToday
-        ? 'p-2 text-sm font-semibold bg-slate-800 text-white rounded-lg'
-        : 'p-2 text-sm font-semibold bg-white text-slate-600 border border-slate-300 rounded-lg';
-      document.getElementById('addTab').className = isToday
-        ? 'p-2 text-sm font-semibold bg-white text-slate-600 border border-slate-300 rounded-lg'
-        : 'p-2 text-sm font-semibold bg-slate-800 text-white rounded-lg';
-    }
-
-    function updateCarpoolDriverFields() {
-      const isWholeWeek = document.getElementById('carpoolSchedule').value === 'week';
-      document.getElementById('carpoolDriver').closest('label').classList.toggle('hidden', isWholeWeek);
-      document.getElementById('weeklyCarpoolDrivers').classList.toggle('hidden', !isWholeWeek);
-    }
-
-    async function submitCarpoolTurn() {
-      const trip = document.getElementById('carpoolTrip').value;
-      const schedule = document.getElementById('carpoolSchedule').value;
-
-      if (schedule === 'day') {
-        const driver = document.getElementById('carpoolDriver').value;
-        postEvent(`🚌 Our Turn Carpool: ${trip} - ${driver}`);
-        return;
-      }
-
-      const selectedDate = document.getElementById('eventDate').value;
-      if (!selectedDate) return alert("Select a date!");
-
-      const firstDay = new Date(`${selectedDate}T12:00:00`);
-      firstDay.setDate(firstDay.getDate() - ((firstDay.getDay() + 6) % 7));
-      const schoolWeekDates = Array.from({ length: 5 }, (_, index) => {
-        const date = new Date(firstDay);
-        date.setDate(firstDay.getDate() + index);
-        return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
-      });
-
-      const weekdayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-      await Promise.all(schoolWeekDates.map((date, index) => {
-        const driver = document.getElementById(`carpoolDriver${weekdayNames[index]}`).value;
-        return postEvent(`🚌 Our Turn Carpool: ${trip} - ${driver}`, date);
-      }));
-      fetchEvents();
-    }
-
-    function getNextWeekdayDate(selectedDate, weekday) {
-      const date = new Date(`${selectedDate}T12:00:00`);
-      date.setDate(date.getDate() + ((weekday - date.getDay() + 7) % 7));
-      return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
-    }
-
-    function submitKidsActivity() {
-      const activity = document.getElementById('kidsActivityName').value.trim();
-      const selectedDate = document.getElementById('eventDate').value;
-      const schedule = document.getElementById('kidsActivitySchedule').value;
-      if (!activity) return alert('Enter an activity name!');
-      if (!selectedDate) return alert('Select a date!');
-
-      const title = `🎨 Kids Activity: ${activity}`;
-      if (schedule === 'day') {
-        postEvent(title);
-        return;
-      }
-
-      const weekdayName = document.getElementById('kidsActivityWeekday').value;
-      const weekdayNumber = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'].indexOf(weekdayName);
-      postEvent(title, getNextWeekdayDate(selectedDate, weekdayNumber), { recurrenceWeekday: weekdayName });
-    }
-    function submitCustom() {
-      const note = document.getElementById('customNote').value;
-      if (note) postEvent(note);
-    }
-
-    updateCarpoolDriverFields();
-    fetchEvents();
-  </script>
 </body>
 </html>

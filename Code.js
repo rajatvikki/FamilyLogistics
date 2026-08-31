@@ -7,13 +7,11 @@ function getCalendar() {
 }
 
 function doGet(e) {
-  const secretKey = getSecretKey();
-  const requestKey = e && e.parameter ? e.parameter.key : null;
-  if (!secretKey || requestKey !== secretKey) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "unauthorized" }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+  return ContentService.createTextOutput(JSON.stringify({ status: "method_not_allowed" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
+function getEventsResponse() {
   const cal = getCalendar();
   const now = new Date();
   // Fetch events for the past 2 days and next 14 days
@@ -48,6 +46,14 @@ function doPost(e) {
     if (!secretKey || data.key !== secretKey) {
         return ContentService.createTextOutput(JSON.stringify({ status: "unauthorized" }));
       }
+
+    if (data.action === "list") {
+      return getEventsResponse();
+    }
+
+    if (data.action && data.action !== "create") {
+      return ContentService.createTextOutput(JSON.stringify({ status: "unsupported_action" }));
+    }
 
     const cal = getCalendar();
     

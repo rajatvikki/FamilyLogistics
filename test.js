@@ -86,6 +86,9 @@ const unauthorized = JSON.parse(post({ title: 'Ignored event', date: '2026-09-01
 assert.deepStrictEqual(unauthorized, { status: 'unauthorized' });
 assert.strictEqual(createdEvents.length, 0);
 
+const unauthorizedList = JSON.parse(post({ action: 'list' }).content);
+assert.deepStrictEqual(unauthorizedList, { status: 'unauthorized' });
+
 const allDayResult = JSON.parse(post({
   key: TEST_SECRET_KEY,
   title: 'Our Turn Carpool: Drop-off - Dad',
@@ -125,10 +128,10 @@ assert.strictEqual(createdEvents.length, 3);
 assert.strictEqual(createdEvents[2].recurrenceWeekday, 'MONDAY');
 assert.deepStrictEqual(createdEvents[2].reminders, [15]);
 
-const unauthorizedGet = JSON.parse(doGet({ parameter: {} }).content);
-assert.deepStrictEqual(unauthorizedGet, { status: 'unauthorized' });
+const directGet = JSON.parse(doGet({}).content);
+assert.deepStrictEqual(directGet, { status: 'method_not_allowed' });
 
-const events = JSON.parse(doGet({ parameter: { key: TEST_SECRET_KEY } }).content);
+const events = JSON.parse(post({ key: TEST_SECRET_KEY, action: 'list' }).content);
 assert.strictEqual(events.length, 3);
 assert.strictEqual(events[0].title, 'Our Turn Carpool: Drop-off - Dad');
 

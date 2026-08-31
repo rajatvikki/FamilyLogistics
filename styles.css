@@ -1,0 +1,68 @@
+:root {
+  color: #1e293b;
+  background: #f1f5f9;
+  font-family: ui-rounded, "Trebuchet MS", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: #f1f5f9; }
+body > div { width: min(100%, 448px); margin: 0 auto; padding: 16px; }
+header, .form-header, .plan-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+header { margin-bottom: 16px; }
+h1 { margin: 0; font-size: 24px; line-height: 1.25; }
+h2, h3 { margin-top: 0; }
+button, input, select { font: inherit; }
+button { border: 0; cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #38bdf8; outline-offset: 2px; }
+header button, #resetPasscodeButton { color: #475569; background: #fff; border: 1px solid #cbd5e1; }
+header button { padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+#resetPasscodeButton { padding: 0; background: transparent; border: 0; text-decoration: underline; font-size: 12px; }
+[role="tablist"] { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+[role="tab"] { padding: 9px; border: 1px solid #cbd5e1; border-radius: 8px; color: #475569; background: #fff; font-size: 14px; font-weight: 700; }
+[role="tab"][aria-selected="true"], .selected { color: #fff !important; background: #1e293b !important; border-color: #1e293b !important; }
+#todayPanel > section { margin-bottom: 24px; }
+#todayTitle, .plan-toolbar h2 { margin-bottom: 12px; color: #64748b; font-size: 14px; }
+.plan-toolbar { margin-bottom: 12px; }
+.plan-toggle { display: flex; overflow: hidden; border: 1px solid #cbd5e1; border-radius: 8px; }
+.plan-toggle button { padding: 6px 10px; color: #475569; background: #fff; font-size: 12px; font-weight: 700; }
+.plan-toggle button + button { border-left: 1px solid #cbd5e1; }
+#todayList, .plan-day, #addPanel { border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; box-shadow: 0 1px 2px rgba(15, 23, 42, .05); }
+#todayList, .plan-day { padding: 12px; }
+#eventsList { display: grid; gap: 8px; }
+.plan-date { margin-bottom: 4px; color: #94a3b8; font-size: 12px; font-weight: 800; }
+.event-list { display: grid; gap: 4px; }
+.event-item { padding: 8px; border-radius: 6px; color: #1e293b; background: #f8fafc; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.status-message { padding: 10px; color: #94a3b8; text-align: center; font-size: 14px; }
+.error-message { color: #dc2626; }
+#addPanel { margin-bottom: 24px; padding: 16px; }
+.form-header h2, #carpoolForm h3, #kidsActivityForm h3 { margin-bottom: 8px; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+.form-header h2 { color: #94a3b8; }
+#eventDate, #kidsActivityName, select, #customNote { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; color: #1e293b; background: #fff; }
+#eventDate { margin-bottom: 12px; font-weight: 600; }
+#presetButtons, .form-grid, #weeklyCarpoolDrivers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#presetButtons { margin-bottom: 12px; }
+#presetButtons button { min-height: 42px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; color: #334155; background: #f8fafc; text-align: left; font-size: 12px; font-weight: 700; }
+#carpoolForm, #kidsActivityForm { margin-bottom: 12px; padding: 12px; border: 1px solid; border-radius: 8px; }
+#carpoolForm { border-color: #fcd34d; background: #fffbeb; }
+#kidsActivityForm { border-color: #fecdd3; background: #fff1f2; }
+#carpoolForm h3, #carpoolForm label { color: #92400e; }
+#kidsActivityForm h3, #kidsActivityForm label { color: #9f1239; }
+#kidsActivityName { margin-bottom: 10px; }
+#kidsActivityForm .form-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
+label { display: block; font-size: 12px; font-weight: 700; }
+label select { margin-top: 4px; }
+#carpoolScheduleLabel { margin: 8px 0; }
+#weeklyCarpoolDrivers { margin-bottom: 8px; }
+#carpoolForm button, #kidsActivityForm button { width: 100%; padding: 9px; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 800; }
+#addCarpoolButton { background: #d97706; }
+#addKidsActivityButton { background: #e11d48; }
+#customEntry { display: flex; gap: 8px; }
+#customEntry input { flex: 1; min-width: 0; }
+#addCustomButton { padding: 9px 16px; border-radius: 8px; color: #fff; background: #2563eb; font-size: 14px; font-weight: 700; }
+button:hover { filter: brightness(.96); }
+.hidden { display: none !important; }
+
+@media (max-width: 360px) {
+  .form-grid, #weeklyCarpoolDrivers { grid-template-columns: 1fr; }
+  .plan-toolbar { align-items: flex-start; flex-direction: column; }
+}
